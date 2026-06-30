@@ -12,7 +12,7 @@ const Page = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
   useEffect(() => {
-    audioRef.current = new Audio("/audo.mp3")
+    audioRef.current = new Audio("/audio.mp3")
     audioRef.current.preload = "auto"
   }, [])
 
