@@ -49,29 +49,29 @@ const HeroSec = ({state}:{state:boolean}) => {
         </div>
 
         {/* Nzoul Box */}
-        <div className="absolute backdrop-blur-sm p-3 rounded-lg top-[55%] left-0 right-0 mx-auto w-fit flex flex-row gap-5 items-center text-black nzoul" style={{ opacity: 0 }}>
-        <span className="w-32 text-center">Nzoul</span>
-        <div className="h-[80px] w-1 border-b-[3px] border-black bg-black"></div>
-        <span className="flex flex-col items-center">
-        <span>May</span>
-        <span className="text-2xl">07</span>
-        <span>2027</span>
-        </span>
-        <div className="h-[80px] w-1 border-b-[3px] border-black bg-black"></div>
-        <span className="w-32 text-center">At 9:00 PM</span>
+        <div className="absolute px-5 backdrop-blur-sm p-3 rounded-lg top-[58%] left-0 right-0 mx-auto w-fit flex flex-row gap-5 items-center text-black nzoul" style={{ opacity: 0 }}>
+          <span className="w-20 text-center">Nzoul</span>
+          <div className="h-[80px] w-1 border-b-[3px] border-black bg-black"></div>
+          <span className="flex flex-col items-center">
+          <span>May</span>
+          <span className="text-2xl">07</span>
+          <span>2027</span>
+          </span>
+          <div className="h-[80px] w-1 border-b-[3px] border-black bg-black"></div>
+          <span className="w-20 text-center">At 9:00 PM</span>
         </div>
 
         {/* Wedding Box */}
-        <div className="absolute backdrop-blur-sm p-3 rounded-lg top-[70%] left-0 right-0 mx-auto w-fit flex flex-row gap-5 items-center text-black wedd" style={{ opacity: 0 }}>
-        <span className="w-32 text-center">Wedding</span>
-        <div className="h-[80px] w-1 border-b-[3px] border-black bg-black"></div>
-        <span className="flex flex-col items-center">
-        <span>May</span>
-        <span className="text-2xl">08</span>
-        <span>2027</span>
-        </span>
-        <div className="h-[80px] w-1 border-b-[3px] border-black bg-black"></div>
-        <span className="w-32 text-center">At 9:00 PM</span>
+        <div className="absolute px-5 backdrop-blur-sm p-3 rounded-lg top-[72%] left-0 right-0 mx-auto w-fit flex flex-row gap-5 items-center text-black wedd" style={{ opacity: 0 }}>
+          <span className="w-20 text-center">Wedding</span>
+          <div className="h-[80px] w-1 border-b-[3px] border-black bg-black"></div>
+          <span className="flex flex-col items-center">
+          <span>May</span>
+          <span className="text-2xl">08</span>
+          <span>2027</span>
+          </span>
+          <div className="h-[80px] w-1 border-b-[3px] border-black bg-black"></div>
+          <span className="w-20 text-center">At 9:00 PM</span>
         </div>
 
       </div>
