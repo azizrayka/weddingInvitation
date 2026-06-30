@@ -67,9 +67,13 @@ const Page = () => {
 
       {/* Stamp button */}
       <button
-        onClick={handleOpen}
-        className="fixed h-40 w-40 rounded-full z-30 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 btn"
-      />
+  onClick={handleOpen}
+  className="fixed h-40 w-40 rounded-full z-30 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 btn border-none outline-none bg-transparent"
+  style={{
+    WebkitTapHighlightColor: 'transparent',
+    backfaceVisibility: 'hidden',
+  }}
+/>
     </div>
   )
 }
