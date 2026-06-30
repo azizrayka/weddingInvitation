@@ -51,20 +51,25 @@ const Page = () => {
   }
 
   return (
+    // 1. Changed w-screen to w-full to prevent horizontal overflow on iOS
+    // 2. Changed h-screen to h-dvh to match the actual visible viewport height
     <div
-      className={`relative w-screen ${
-        isOpen ? "overflow-y-auto" : "h-screen overflow-hidden"
+      className={`relative w-full ${
+        isOpen ? "overflow-y-auto" : "h-dvh overflow-hidden"
       }`}
     >
       <HeroSec state={isOpen} />
 
       {/* Left door */}
-      <div className={`fixed mb-2 inset-0 z-20 ${isOpen ? "hidden" : ""}`}>
-        <Image className="object-cover im1" src="/part1.png" alt="" fill priority />
+      {/* 3. Changed inset-0 to top-0 inset-x-0 h-dvh. 
+             Using bottom: 0 (from inset-0) on fixed elements causes gaps on iOS. 
+             Explicitly setting the height to 100dvh ensures it perfectly covers the screen. */}
+      <div className={`fixed top-[-1dvh] inset-x-0 h-dvh z-[21] ${isOpen ? "hidden" : ""}`}>
+        <Image className="object-cover im1" src="/gpart1.png" alt="" fill priority />
       </div>
 
       {/* Right door */}
-      <div className={`fixed inset-0 z-20 ${isOpen ? "hidden" : ""}`}>
+      <div className={`fixed top-0 inset-x-0 h-dvh z-[20] ${isOpen ? "hidden" : ""}`}>
         <Image className="object-cover im2" src="/stamp.png" alt="" fill priority />
       </div>
 
