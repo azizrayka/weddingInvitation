@@ -118,7 +118,7 @@ const Detailes = () => {
             <span className="text-3xl font-bold texte">Nzoul count down</span>
             <div className="taban"><Countdown targetDate="2027-05-07T21:00:00" /></div>
             <div className="relative h-[700px] animimg">
-                <span className="text-3xl font-bold texte">Nzoul dress code</span>
+                <span className="text-3xl font-bold texte">Nzoul dress code <br/>traditional</span>
                 <Image
                     src="/w1.jpg"
                     alt="OF"
