@@ -160,7 +160,7 @@ const Detailes = () => {
                     priority
                 />
             </div>
-            <div className="flex flex-col gap-5 justify-center items-center">
+            <div className="flex flex-col gap-5 justify-center items-center mx-3">
                 <span className="text-3xl font-bold texte">Nzoul location</span>
                 <Location name={"MARASSIM"} address={"route Teniour km 9,5 chihia Sfax, BP 3041, Sakiet Ezzit"} mapsUrl={"https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3275.321174446886!2d10.7328927!3d34.82301650000001!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1301d35cdb3518f5%3A0xe43a5623eae16e25!2sMARASSIM!5e0!3m2!1sen!2stn!4v1782836973895!5m2!1sen!2stn"} />
             </div>
@@ -169,7 +169,7 @@ const Detailes = () => {
         <div className="flex flex-col gap-5 justify-center items-center py-10">
             <span className="text-3xl font-bold texte">wedding count down</span>
             <div className="taban2"><Countdown targetDate="2027-05-08T21:00:00" /></div>
-            <div className="flex flex-col gap-5 justify-center items-center mx-2">
+            <div className="flex flex-col gap-5 justify-center items-center mx-3">
                 <span className="text-3xl font-bold texte">Wedding location</span>
                 <Location name={"MARASSIM"} address={"route Teniour km 9,5 chihia Sfax, BP 3041, Sakiet Ezzit"} mapsUrl={"https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3275.321174446886!2d10.7328927!3d34.82301650000001!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1301d35cdb3518f5%3A0xe43a5623eae16e25!2sMARASSIM!5e0!3m2!1sen!2stn!4v1782836973895!5m2!1sen!2stn"} />
             </div>
