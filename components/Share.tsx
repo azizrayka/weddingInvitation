@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useState, useRef, ChangeEvent, DragEvent } from "react";
+import { useState, useRef, useEffect, ChangeEvent, DragEvent } from "react";
 
 interface UploadResponse {
   secure_url: string;
@@ -17,11 +17,24 @@ interface FileItem {
   error?: string;
 }
 
+
 export default function CloudinaryMultiUploader() {
   const [files, setFiles] = useState<FileItem[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  
+  // Ref to keep track of files for cleanup on unmount (prevents memory leaks)
+  const filesRef = useRef<FileItem[]>([]);
+  useEffect(() => {
+    filesRef.current = files;
+  }, [files]);
+
+  useEffect(() => {
+    return () => {
+      filesRef.current.forEach((f) => URL.revokeObjectURL(f.preview));
+    };
+  }, []);
 
   // 1. Process selected/dropped files
   const processFiles = (fileList: FileList) => {
@@ -29,10 +42,9 @@ export default function CloudinaryMultiUploader() {
     
     for (let i = 0; i < fileList.length; i++) {
       const file = fileList[i];
-      if (!file.type.startsWith("image/")) continue; // Skip non-images
+      if (!file.type.startsWith("image/")) continue;
 
       const id = Math.random().toString(36).substring(2, 9);
-      // Create a local blob URL for instant preview (avoids next/image errors)
       const preview = URL.createObjectURL(file); 
       
       newFiles.push({ id, file, preview, status: "pending" });
@@ -45,7 +57,7 @@ export default function CloudinaryMultiUploader() {
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) processFiles(e.target.files);
-    if (inputRef.current) inputRef.current.value = ""; // Reset input so same file can be re-selected
+    if (inputRef.current) inputRef.current.value = ""; 
   };
 
   const handleDrop = (e: DragEvent<HTMLDivElement>) => {
@@ -58,7 +70,7 @@ export default function CloudinaryMultiUploader() {
   const removeFile = (id: string) => {
     setFiles((prev) => {
       const fileToRemove = prev.find((f) => f.id === id);
-      if (fileToRemove) URL.revokeObjectURL(fileToRemove.preview); // Prevent memory leaks
+      if (fileToRemove) URL.revokeObjectURL(fileToRemove.preview); 
       return prev.filter((f) => f.id !== id);
     });
   };
@@ -70,45 +82,51 @@ export default function CloudinaryMultiUploader() {
 
   // 3. Handle Concurrent Uploads
   const handleUpload = async () => {
+    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+    const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+
+    // Safety check to prevent silent failures if .env.local is missing or server wasn't restarted
+    if (!cloudName || !uploadPreset) {
+      console.error("Missing Cloudinary environment variables.");
+      alert("Configuration error: Missing Cloudinary credentials. Please check .env.local and restart your dev server.");
+      return;
+    }
+
     const pendingFiles = files.filter((f) => f.status === "pending");
     if (pendingFiles.length === 0) return;
 
     setIsUploading(true);
 
-    // Mark all pending files as uploading immediately
     setFiles((prev) =>
       prev.map((f) => (f.status === "pending" ? { ...f, status: "uploading" } : f))
     );
 
-    // Create an array of upload promises to run concurrently
     const uploadPromises = pendingFiles.map(async (item) => {
       const formData = new FormData();
       formData.append("file", item.file);
-      formData.append(
-        "upload_preset",
-        process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!
-      );
+      formData.append("upload_preset", uploadPreset);
 
       try {
         const response = await fetch(
-          `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+          `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
           { method: "POST", body: formData }
         );
 
         const data = await response.json();
         if (!response.ok) throw new Error(data.error?.message || "Upload failed");
 
-        // Mark this specific file as success
+        // Cast to our interface for type safety
+        const uploadData = data as UploadResponse;
+
         setFiles((prev) =>
           prev.map((f) =>
-            f.id === item.id ? { ...f, status: "success", result: data } : f
+            f.id === item.id ? { ...f, status: "success", result: uploadData } : f
           )
         );
       } catch (err: unknown) {
         const errorMessage =
           err instanceof Error ? err.message : typeof err === "string" ? err : "Upload failed";
 
-        // Mark this specific file as error
         setFiles((prev) =>
           prev.map((f) =>
             f.id === item.id ? { ...f, status: "error", error: errorMessage } : f
@@ -117,7 +135,6 @@ export default function CloudinaryMultiUploader() {
       }
     });
 
-    // Wait for all uploads to finish (whether they succeeded or failed)
     await Promise.allSettled(uploadPromises);
     setIsUploading(false);
   };
@@ -125,13 +142,18 @@ export default function CloudinaryMultiUploader() {
   const pendingCount = files.filter((f) => f.status === "pending").length;
 
   return (
-    <div className="w-full h-[50vh] max-w-2xl mx-auto p-6 bg-white rounded-xl shadow-lg space-y-6">
+    <div className="w-full max-w-2xl mx-auto p-6 bg-white rounded-xl shadow-lg space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-800">Upload Photos</h2>
         {files.length > 0 && (
           <button
             onClick={clearAll}
-            className="text-sm text-red-600 hover:text-red-800 font-medium"
+            disabled={isUploading}
+            className={`text-sm font-medium transition ${
+              isUploading 
+                ? 'text-gray-400 cursor-not-allowed' 
+                : 'text-red-600 hover:text-red-800'
+            }`}
           >
             Clear All
           </button>
@@ -140,11 +162,19 @@ export default function CloudinaryMultiUploader() {
 
       {/* Dropzone */}
       <div
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            inputRef.current?.click();
+          }
+        }}
         onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
         onDragLeave={() => setIsDragging(false)}
         onDrop={handleDrop}
         onClick={() => inputRef.current?.click()}
-        className={`relative border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors
+        className={`relative border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors outline-none focus:ring-2 focus:ring-blue-500
           ${isDragging ? "border-blue-500 bg-blue-50" : "border-gray-300 hover:border-gray-400 bg-gray-50"}`}
       >
         <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
@@ -155,7 +185,6 @@ export default function CloudinaryMultiUploader() {
         </p>
         <p className="text-xs text-gray-500">PNG, JPG, GIF (Multiple allowed)</p>
 
-        {/* The 'multiple' attribute enables selecting more than one file */}
         <input
           ref={inputRef}
           type="file"
@@ -174,7 +203,6 @@ export default function CloudinaryMultiUploader() {
               key={item.id}
               className="relative group aspect-square rounded-lg overflow-hidden border border-gray-200 bg-gray-100"
             >
-              {/* Using native <img> for local blob previews avoids next/image config errors */}
               <img
                 src={item.preview}
                 alt={item.file.name}
@@ -202,11 +230,12 @@ export default function CloudinaryMultiUploader() {
                 </div>
               )}
 
-              {/* Remove Button (Only visible on hover for pending files) */}
+              {/* Remove Button */}
               {item.status === "pending" && (
                 <button
                   onClick={(e) => { e.stopPropagation(); removeFile(item.id); }}
                   className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                  aria-label="Remove file"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -218,8 +247,8 @@ export default function CloudinaryMultiUploader() {
         </div>
       )}
 
-      {/* Upload Button */}
-      {pendingCount > 0 && (
+      {/* Upload Button - FIXED: Now stays visible while isUploading is true */}
+      {(pendingCount > 0 || isUploading) && (
         <button
           onClick={handleUpload}
           disabled={isUploading}

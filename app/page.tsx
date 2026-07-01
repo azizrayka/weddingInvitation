@@ -64,19 +64,19 @@ const Page = () => {
       {/* 3. Changed inset-0 to top-0 inset-x-0 h-dvh. 
              Using bottom: 0 (from inset-0) on fixed elements causes gaps on iOS. 
              Explicitly setting the height to 100dvh ensures it perfectly covers the screen. */}
-      <div className={`fixed top-[-1dvh] inset-x-0 h-dvh z-[21] ${isOpen ? "hidden" : ""}`}>
-        <Image className="object-cover im1" src="/gpart1.png" alt="" fill priority />
+      <div className={`fixed top-0 inset-x-0 h-dvh z-[21] ${isOpen ? "hidden" : ""}`}>
+        <Image className="object-cover im1" src="/cardhright.png" alt="" fill priority />
       </div>
 
       {/* Right door */}
       <div className={`fixed top-0 inset-x-0 h-dvh z-[20] ${isOpen ? "hidden" : ""}`}>
-        <Image className="object-cover im2" src="/stamp.png" alt="" fill priority />
+        <Image className="object-cover im2" src="/cardhleftbg.png" alt="" fill priority />
       </div>
 
       {/* Stamp button */}
       <button
         onClick={handleOpen}
-        className="fixed h-40 w-40 rounded-full z-30 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 btn border-none outline-none bg-transparent"
+        className="fixed h-30 w-30 rounded-full z-30 top-1/2 left-[30%] transform -translate-x-1/2 -translate-y-1/2 btn border-none outline-none bg-[url(/stamp.png)] bg-cover bg-center cursor-pointer"
         style={{
           WebkitTapHighlightColor: "transparent",
           backfaceVisibility: "hidden",
