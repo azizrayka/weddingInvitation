@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @next/next/no-img-element */
+export const dynamic = "force-dynamic";
 import { v2 as cloudinary } from "cloudinary";
 // Inline a simple Lightbox replacement to avoid import errors for
 // ./components/Lightbox which may be missing. This keeps changes
